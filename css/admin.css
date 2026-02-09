@@ -413,8 +413,8 @@
 .status-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+    align-items: flex-start;
+    gap: 1.5rem;
 }
 
 .status-header h3 {

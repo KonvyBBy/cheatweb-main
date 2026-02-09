@@ -65,8 +65,10 @@
             <!-- Status Page Management Tab -->
             <div id="status-tab" class="admin-tab">
                 <div class="admin-header">
-                    <h1>Status Management</h1>
-                    <p class="admin-subtitle">Manage product status visibility</p>
+                    <div>
+                        <h1>Status Management</h1>
+                        <p class="admin-subtitle">Update the status of each product</p>
+                    </div>
                 </div>
 
                 <div class="status-list" id="status-list">
@@ -103,48 +105,24 @@
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="product-badge">Badge</label>
-                                <input type="text" id="product-badge" placeholder="Popular, New">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="product-status">Status</label>
-                                <select id="product-status">
-                                    <option value="working">✓ Working</option>
-                                    <option value="caution">⚠ Caution</option>
-                                    <option value="updating">🔄 Updating</option>
-                                    <option value="offline">✗ Offline</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
                                 <label for="product-price">Base Price ($)</label>
                                 <input type="number" id="product-price" step="0.01" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="product-period">Period</label>
+                                <label for="product-period">Access Duration</label>
                                 <select id="product-period">
-                                    <option value="/month">Monthly</option>
-                                    <option value="/week">Weekly</option>
-                                    <option value="/year">Yearly</option>
-                                    <option value="">One-time</option>
+                                    <option value="/month">1 Month Access</option>
+                                    <option value="/week">1 Week Access</option>
+                                    <option value="/year">1 Year Access</option>
+                                    <option value="">Lifetime Access</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="product-image">Image URL</label>
+                            <label for="product-image">Image URL (Optional)</label>
                             <input type="text" id="product-image" placeholder="https://example.com/image.jpg">
-                        </div>
-
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="product-featured">
-                                <span>Featured Product</span>
-                            </label>
                         </div>
                     </div>
 

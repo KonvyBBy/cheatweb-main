@@ -5,11 +5,11 @@ const AUTH_KEY = 'astral_admin_auth';
 const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1470525672756871414/wR6Upu2fD0rs1fjrg1OI0p_EaGyZAgX6U4glkyJwnAtzYrLxd7iziW5x-HCe-ODsNGfF';
 
 // Send Discord notification
-async function sendDiscordNotification(action, productName, details = '') {
+async function sendDiscordNotification(action, details = '', color = 0xa855f7) {
     const embed = {
-        title: `🎮 Admin Action: ${action}`,
-        description: `**Product:** ${productName}\n${details}`,
-        color: action.includes('Added') ? 0x22c55e : action.includes('Deleted') ? 0xef4444 : 0xa855f7,
+        title: `🎮 ${action}`,
+        description: details,
+        color: color,
         timestamp: new Date().toISOString(),
         footer: {
             text: 'Astral Cheats Admin Panel'
@@ -17,7 +17,7 @@ async function sendDiscordNotification(action, productName, details = '') {
     };
 
     try {
-        await fetch(DISCORD_WEBHOOK, {
+        const response = await fetch(DISCORD_WEBHOOK, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,6 +26,10 @@ async function sendDiscordNotification(action, productName, details = '') {
                 embeds: [embed]
             })
         });
+        
+        if (!response.ok) {
+            console.error('Discord webhook failed:', response.status);
+        }
     } catch (error) {
         console.error('Failed to send Discord notification:', error);
     }
@@ -78,7 +82,7 @@ function showAdminPanel() {
 }
 
 // Handle login
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
     
     const password = document.getElementById('admin-password').value;
@@ -88,11 +92,25 @@ function handleLogin(e) {
         sessionStorage.setItem(AUTH_KEY, 'true');
         showAdminPanel();
         showNotification('Welcome, Administrator! 👑');
+        
+        // Send Discord notification for login
+        await sendDiscordNotification(
+            'Admin Login',
+            `🔐 Administrator logged into the panel\n**Time:** ${new Date().toLocaleString()}`,
+            0x3b82f6
+        );
     } else {
         errorElement.textContent = 'Invalid password. Access denied.';
         setTimeout(() => {
             errorElement.textContent = '';
         }, 3000);
+        
+        // Send Discord notification for failed login
+        await sendDiscordNotification(
+            'Failed Login Attempt',
+            `⚠️ Someone tried to access the admin panel with incorrect password\n**Time:** ${new Date().toLocaleString()}`,
+            0xef4444
+        );
     }
 }
 
@@ -117,8 +135,16 @@ function setupEventListeners() {
     });
     
     // Logout
-    document.getElementById('logout-btn').addEventListener('click', (e) => {
+    document.getElementById('logout-btn').addEventListener('click', async (e) => {
         e.preventDefault();
+        
+        // Send Discord notification for logout
+        await sendDiscordNotification(
+            'Admin Logout',
+            `👋 Administrator logged out of the panel\n**Time:** ${new Date().toLocaleString()}`,
+            0x94a3b8
+        );
+        
         sessionStorage.removeItem(AUTH_KEY);
         location.reload();
     });
@@ -162,9 +188,8 @@ function initializeDefaultProducts() {
         const defaultProducts = [
             {
                 id: 1,
-                name: 'Fortnite',
+                name: 'Fortnite Premium',
                 category: 'Fortnite',
-                badge: 'Popular',
                 price: 29.99,
                 period: '/month',
                 features: [
@@ -177,7 +202,6 @@ function initializeDefaultProducts() {
                 description: 'Premium Fortnite cheat with advanced features',
                 image: '',
                 status: 'working',
-                featured: false,
                 durations: [
                     { label: '1 Day', days: 1, price: 4.99 },
                     { label: '1 Week', days: 7, price: 14.99 },
@@ -187,9 +211,8 @@ function initializeDefaultProducts() {
             },
             {
                 id: 2,
-                name: 'Valorant',
+                name: 'Valorant Elite',
                 category: 'Valorant',
-                badge: 'Featured',
                 price: 39.99,
                 period: '/month',
                 features: [
@@ -202,7 +225,6 @@ function initializeDefaultProducts() {
                 description: 'Top-tier Valorant cheat for competitive play',
                 image: '',
                 status: 'working',
-                featured: true,
                 durations: [
                     { label: '1 Day', days: 1, price: 5.99 },
                     { label: '1 Week', days: 7, price: 19.99 },
@@ -212,9 +234,8 @@ function initializeDefaultProducts() {
             },
             {
                 id: 3,
-                name: 'Apex Legends',
+                name: 'Apex Legends Pro',
                 category: 'Apex Legends',
-                badge: 'New',
                 price: 34.99,
                 period: '/month',
                 features: [
@@ -226,38 +247,12 @@ function initializeDefaultProducts() {
                 ],
                 description: 'Advanced Apex Legends cheat suite',
                 image: '',
-                status: 'updating',
-                featured: false,
+                status: 'working',
                 durations: [
                     { label: '1 Day', days: 1, price: 4.99 },
                     { label: '1 Week', days: 7, price: 17.49 },
                     { label: '1 Month', days: 30, price: 34.99 },
                     { label: '3 Months', days: 90, price: 84.99 }
-                ]
-            },
-            {
-                id: 4,
-                name: 'Warzone',
-                category: 'Warzone',
-                badge: 'Updated',
-                price: 32.99,
-                period: '/month',
-                features: [
-                    'Full ESP suite',
-                    'Advanced Aimbot',
-                    '2D/3D Radar',
-                    'Vehicle ESP',
-                    'No fog & weather control'
-                ],
-                description: 'Comprehensive Warzone cheat package',
-                image: '',
-                status: 'working',
-                featured: false,
-                durations: [
-                    { label: '1 Day', days: 1, price: 4.99 },
-                    { label: '1 Week', days: 7, price: 16.49 },
-                    { label: '1 Month', days: 30, price: 32.99 },
-                    { label: '3 Months', days: 90, price: 79.99 }
                 ]
             }
         ];
@@ -283,7 +278,7 @@ function loadProducts() {
     const container = document.getElementById('products-list');
     
     if (products.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">No products yet. Add your first product!</p>';
+        container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No products yet. Add your first product!</p>';
         return;
     }
     
@@ -296,11 +291,10 @@ function loadProducts() {
                 <h3>${product.name}</h3>
                 <div class="product-meta">
                     <span class="product-price">$${product.price}${product.period}</span>
-                    ${product.badge ? `<span class="product-badge-display">${product.badge}</span>` : ''}
                     <span class="product-status-text status-${product.status}">${getStatusLabel(product.status)}</span>
-                    ${product.featured ? '<span class="product-badge-display">⭐ Featured</span>' : ''}
+                    ${product.category ? `<span style="color: var(--text-muted); font-size: 0.9rem;">📁 ${product.category}</span>` : ''}
                 </div>
-                <p class="product-features-preview">${product.features.length} features</p>
+                <p class="product-features-preview">${product.features.length} features • ${product.durations.length} pricing options</p>
             </div>
             <div class="product-actions">
                 <button class="btn btn-small btn-edit" onclick="editProduct(${product.id})">Edit</button>
@@ -316,14 +310,19 @@ function loadStatusPage() {
     const container = document.getElementById('status-list');
     
     if (products.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">No products to display status for.</p>';
+        container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No products yet. Add products to manage their status.</p>';
         return;
     }
     
     container.innerHTML = products.map(product => `
         <div class="status-item">
             <div class="status-header">
-                <h3>${product.name}</h3>
+                <div>
+                    <h3>${product.name}</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
+                        ${product.category || 'No category'} • Current: <span class="product-status-text status-${product.status}">${getStatusLabel(product.status)}</span>
+                    </p>
+                </div>
                 <div class="status-controls">
                     <button class="status-btn status-btn-working ${product.status === 'working' ? 'active' : ''}" 
                             onclick="updateProductStatus(${product.id}, 'working')">
@@ -370,7 +369,7 @@ function getStatusLabel(status) {
 }
 
 // Update product status
-function updateProductStatus(productId, newStatus) {
+async function updateProductStatus(productId, newStatus) {
     const products = getProducts();
     const product = products.find(p => p.id === productId);
     
@@ -378,14 +377,22 @@ function updateProductStatus(productId, newStatus) {
         const oldStatus = product.status;
         product.status = newStatus;
         saveProducts(products);
+        loadProducts();
         loadStatusPage();
         showNotification(`Status updated: ${product.name} is now ${getStatusLabel(newStatus)}`);
         
         // Send Discord notification
-        sendDiscordNotification(
+        const statusColors = {
+            working: 0x22c55e,
+            caution: 0xf97316,
+            updating: 0x3b82f6,
+            offline: 0xef4444
+        };
+        
+        await sendDiscordNotification(
             'Status Updated',
-            product.name,
-            `Status changed from **${getStatusLabel(oldStatus)}** to **${getStatusLabel(newStatus)}**`
+            `**Product:** ${product.name}\n**Old Status:** ${getStatusLabel(oldStatus)}\n**New Status:** ${getStatusLabel(newStatus)}\n**Category:** ${product.category || 'N/A'}`,
+            statusColors[newStatus] || 0xa855f7
         );
     }
 }
@@ -410,14 +417,11 @@ function editProduct(productId) {
         document.getElementById('product-id').value = product.id;
         document.getElementById('product-name').value = product.name;
         document.getElementById('product-category').value = product.category || '';
-        document.getElementById('product-badge').value = product.badge || '';
         document.getElementById('product-price').value = product.price;
         document.getElementById('product-period').value = product.period;
         document.getElementById('product-features').value = product.features.join('\n');
         document.getElementById('product-description').value = product.description || '';
         document.getElementById('product-image').value = product.image || '';
-        document.getElementById('product-status').value = product.status;
-        document.getElementById('product-featured').checked = product.featured || false;
         
         // Load durations
         loadDurations(product.durations || []);
@@ -517,11 +521,12 @@ function getDurationsFromForm() {
 }
 
 // Delete product
-function deleteProduct(productId) {
+async function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         let products = getProducts();
         const product = products.find(p => p.id === productId);
         const productName = product ? product.name : 'Unknown';
+        const productCategory = product ? product.category : 'N/A';
         
         products = products.filter(p => p.id !== productId);
         saveProducts(products);
@@ -530,10 +535,10 @@ function deleteProduct(productId) {
         showNotification('Product deleted successfully');
         
         // Send Discord notification
-        sendDiscordNotification(
+        await sendDiscordNotification(
             'Product Deleted',
-            productName,
-            '❌ This product has been removed from the store'
+            `❌ **Product:** ${productName}\n**Category:** ${productCategory}\n**Action:** Removed from store`,
+            0xef4444
         );
     }
 }
@@ -544,28 +549,25 @@ function closeModal() {
 }
 
 // Handle product save
-function handleProductSave(e) {
+async function handleProductSave(e) {
     e.preventDefault();
     
     const productId = document.getElementById('product-id').value;
     const products = getProducts();
+    const isNewProduct = !productId;
     
     const productData = {
         id: productId ? parseInt(productId) : Date.now(),
         name: document.getElementById('product-name').value,
         category: document.getElementById('product-category').value,
-        badge: document.getElementById('product-badge').value,
         price: parseFloat(document.getElementById('product-price').value),
         period: document.getElementById('product-period').value,
         features: document.getElementById('product-features').value.split('\n').filter(f => f.trim()),
         description: document.getElementById('product-description').value,
         image: document.getElementById('product-image').value,
-        status: document.getElementById('product-status').value,
-        featured: document.getElementById('product-featured').checked,
+        status: isNewProduct ? 'working' : (products.find(p => p.id === parseInt(productId))?.status || 'working'),
         durations: getDurationsFromForm()
     };
-    
-    const isNewProduct = !productId;
     
     if (productId) {
         // Update existing product
@@ -582,12 +584,18 @@ function handleProductSave(e) {
     loadProducts();
     loadStatusPage();
     closeModal();
-    showNotification(productId ? 'Product updated successfully' : 'Product added successfully');
+    showNotification(isNewProduct ? 'Product added successfully' : 'Product updated successfully');
     
     // Send Discord notification
     const action = isNewProduct ? 'Product Added' : 'Product Updated';
-    const details = `**Category:** ${productData.category}\n**Price:** $${productData.price}${productData.period}\n**Status:** ${getStatusLabel(productData.status)}\n**Features:** ${productData.features.length} features`;
-    sendDiscordNotification(action, productData.name, details);
+    const actionColor = isNewProduct ? 0x22c55e : 0xa855f7;
+    const actionIcon = isNewProduct ? '✅' : '📝';
+    
+    await sendDiscordNotification(
+        action,
+        `${actionIcon} **Product:** ${productData.name}\n**Category:** ${productData.category}\n**Price:** $${productData.price}${productData.period}\n**Status:** ${getStatusLabel(productData.status)}\n**Features:** ${productData.features.length}\n**Pricing Options:** ${productData.durations.length}`,
+        actionColor
+    );
 }
 
 // Make functions globally accessible
