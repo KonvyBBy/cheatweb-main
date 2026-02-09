@@ -78,6 +78,7 @@
 
     <!-- Product Edit Modal -->
     <div id="product-modal" class="modal">
+        <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modal-title">Edit Product</h2>
@@ -86,75 +87,87 @@
             <form id="product-form" class="product-form">
                 <input type="hidden" id="product-id">
                 
-                <div class="form-group">
-                    <label for="product-name">Product Name</label>
-                    <input type="text" id="product-name" required>
-                </div>
+                <div class="form-grid">
+                    <!-- Left Column -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="product-name">Product Name</label>
+                            <input type="text" id="product-name" required>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-category">Category / Game</label>
-                    <input type="text" id="product-category" placeholder="e.g., Fortnite, Valorant" list="category-suggestions" required>
-                    <datalist id="category-suggestions"></datalist>
-                </div>
+                        <div class="form-group">
+                            <label for="product-category">Category / Game</label>
+                            <input type="text" id="product-category" placeholder="e.g., Fortnite, Valorant" list="category-suggestions" required>
+                            <datalist id="category-suggestions"></datalist>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-badge">Badge</label>
-                    <input type="text" id="product-badge" placeholder="e.g., Popular, New, Updated">
-                </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-badge">Badge</label>
+                                <input type="text" id="product-badge" placeholder="Popular, New">
+                            </div>
 
-                <div class="form-group">
-                    <label for="product-price">Price ($)</label>
-                    <input type="number" id="product-price" step="0.01" required>
-                </div>
+                            <div class="form-group">
+                                <label for="product-status">Status</label>
+                                <select id="product-status">
+                                    <option value="working">✓ Working</option>
+                                    <option value="caution">⚠ Caution</option>
+                                    <option value="updating">🔄 Updating</option>
+                                    <option value="offline">✗ Offline</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-period">Billing Period</label>
-                    <select id="product-period">
-                        <option value="/month">Monthly</option>
-                        <option value="/week">Weekly</option>
-                        <option value="/year">Yearly</option>
-                        <option value="">One-time</option>
-                    </select>
-                </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-price">Base Price ($)</label>
+                                <input type="number" id="product-price" step="0.01" required>
+                            </div>
 
-                <div class="form-group">
-                    <label for="product-features">Features (one per line)</label>
-                    <textarea id="product-features" rows="6" required></textarea>
-                </div>
+                            <div class="form-group">
+                                <label for="product-period">Period</label>
+                                <select id="product-period">
+                                    <option value="/month">Monthly</option>
+                                    <option value="/week">Weekly</option>
+                                    <option value="/year">Yearly</option>
+                                    <option value="">One-time</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-description">Description</label>
-                    <textarea id="product-description" rows="3"></textarea>
-                </div>
+                        <div class="form-group">
+                            <label for="product-image">Image URL</label>
+                            <input type="text" id="product-image" placeholder="https://example.com/image.jpg">
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-image">Image URL</label>
-                    <input type="text" id="product-image" placeholder="https://example.com/image.jpg">
-                </div>
-
-                <div class="form-group">
-                    <label>Pricing Durations</label>
-                    <div id="durations-list" class="durations-list">
-                        <!-- Duration inputs will be added here -->
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="product-featured">
+                                <span>Featured Product</span>
+                            </label>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-secondary btn-small" id="add-duration-btn">+ Add Duration</button>
-                </div>
 
-                <div class="form-group">
-                    <label for="product-status">Status</label>
-                    <select id="product-status">
-                        <option value="working" data-color="green">✓ Working / Updated (Green)</option>
-                        <option value="caution" data-color="orange">⚠ Working - Use at Own Risk (Orange)</option>
-                        <option value="updating" data-color="blue">🔄 Updating (Blue)</option>
-                        <option value="offline" data-color="red">✗ Offline (Red)</option>
-                    </select>
-                </div>
+                    <!-- Right Column -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="product-features">Features (one per line)</label>
+                            <textarea id="product-features" rows="8" required></textarea>
+                        </div>
 
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="product-featured">
-                        Featured Product
-                    </label>
+                        <div class="form-group">
+                            <label for="product-description">Description</label>
+                            <textarea id="product-description" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pricing Durations</label>
+                            <div id="durations-list" class="durations-list">
+                                <!-- Duration inputs will be added here -->
+                            </div>
+                            <button type="button" class="btn-add-duration" id="add-duration-btn">+ Add Duration</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-actions">

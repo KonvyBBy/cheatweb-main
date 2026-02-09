@@ -2,6 +2,34 @@
 const ADMIN_PASSWORD = 'KonvyIsKing123';
 const STORAGE_KEY = 'astral_products';
 const AUTH_KEY = 'astral_admin_auth';
+const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1470525672756871414/wR6Upu2fD0rs1fjrg1OI0p_EaGyZAgX6U4glkyJwnAtzYrLxd7iziW5x-HCe-ODsNGfF';
+
+// Send Discord notification
+async function sendDiscordNotification(action, productName, details = '') {
+    const embed = {
+        title: `🎮 Admin Action: ${action}`,
+        description: `**Product:** ${productName}\n${details}`,
+        color: action.includes('Added') ? 0x22c55e : action.includes('Deleted') ? 0xef4444 : 0xa855f7,
+        timestamp: new Date().toISOString(),
+        footer: {
+            text: 'Astral Cheats Admin Panel'
+        }
+    };
+
+    try {
+        await fetch(DISCORD_WEBHOOK, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                embeds: [embed]
+            })
+        });
+    } catch (error) {
+        console.error('Failed to send Discord notification:', error);
+    }
+}
 
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -347,10 +375,18 @@ function updateProductStatus(productId, newStatus) {
     const product = products.find(p => p.id === productId);
     
     if (product) {
+        const oldStatus = product.status;
         product.status = newStatus;
         saveProducts(products);
         loadStatusPage();
         showNotification(`Status updated: ${product.name} is now ${getStatusLabel(newStatus)}`);
+        
+        // Send Discord notification
+        sendDiscordNotification(
+            'Status Updated',
+            product.name,
+            `Status changed from **${getStatusLabel(oldStatus)}** to **${getStatusLabel(newStatus)}**`
+        );
     }
 }
 
@@ -484,11 +520,21 @@ function getDurationsFromForm() {
 function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         let products = getProducts();
+        const product = products.find(p => p.id === productId);
+        const productName = product ? product.name : 'Unknown';
+        
         products = products.filter(p => p.id !== productId);
         saveProducts(products);
         loadProducts();
         loadStatusPage();
         showNotification('Product deleted successfully');
+        
+        // Send Discord notification
+        sendDiscordNotification(
+            'Product Deleted',
+            productName,
+            '❌ This product has been removed from the store'
+        );
     }
 }
 
@@ -519,6 +565,8 @@ function handleProductSave(e) {
         durations: getDurationsFromForm()
     };
     
+    const isNewProduct = !productId;
+    
     if (productId) {
         // Update existing product
         const index = products.findIndex(p => p.id === parseInt(productId));
@@ -535,6 +583,11 @@ function handleProductSave(e) {
     loadStatusPage();
     closeModal();
     showNotification(productId ? 'Product updated successfully' : 'Product added successfully');
+    
+    // Send Discord notification
+    const action = isNewProduct ? 'Product Added' : 'Product Updated';
+    const details = `**Category:** ${productData.category}\n**Price:** $${productData.price}${productData.period}\n**Status:** ${getStatusLabel(productData.status)}\n**Features:** ${productData.features.length} features`;
+    sendDiscordNotification(action, productData.name, details);
 }
 
 // Make functions globally accessible
